@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎨 Belajar Huruf & Angka - Game Edukasi Anak</title>
+<title>🎮 Tebak Kata - Game Edukasi Anak</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif; }
   
   body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #a1c4fd 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
     overflow-x: hidden;
   }
   
   h1 {
     color: #fff;
-    font-size: 2.5rem;
-    text-shadow: 3px 3px 0 #ff6b9d, 6px 6px 10px rgba(0,0,0,0.2);
+    font-size: 2rem;
+    text-shadow: 3px 3px 0 #ff6b9d, 6px 6px 10px rgba(0,0,0,0.3);
     margin-bottom: 10px;
     text-align: center;
     animation: bounce 2s infinite;
@@ -31,423 +31,699 @@
     50% { transform: translateY(-10px); }
   }
   
-  .subtitle {
-    color: #fff;
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-  }
-  
-  .game-container {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 30px;
-    padding: 30px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  .game-wrapper {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 25px;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     width: 100%;
-    max-width: 900px;
-    border: 5px dashed #ff6b9d;
+    max-width: 800px;
+    border: 5px solid #ffd93d;
   }
   
-  .current-letter {
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #ffd93d, #ff6b9d);
-    border-radius: 30px;
+  .stats-bar {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    border-radius: 15px;
+  }
+  
+  .stat {
+    background: rgba(255,255,255,0.9);
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9rem;
+  }
+  
+  .stat span { color: #fff; background: #ff6b9d; padding: 2px 8px; border-radius: 5px; margin-left: 5px; }
+  
+  .category-selector {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+  
+  .cat-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+  
+  .cat-btn:hover { transform: scale(1.05); }
+  .cat-btn.active { background: linear-gradient(135deg, #ff6b9d, #ff8e53); box-shadow: 0 5px 15px rgba(255,107,157,0.4); }
+  
+  .image-container {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    margin: 0 auto 15px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 5px solid #ffd93d;
+    position: relative;
+    background: #f0f0f0;
+  }
+  
+  .game-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .image-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .hint-box {
+    background: linear-gradient(135deg, #fff9e6, #ffeaa7);
+    border: 3px dashed #ffd93d;
+    border-radius: 15px;
+    padding: 12px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #d63031;
+    font-weight: bold;
+  }
+  
+  .word-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    min-height: 60px;
+    align-items: center;
+  }
+  
+  .letter-slot {
+    width: 50px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10rem;
+    font-size: 2rem;
     font-weight: bold;
     color: #fff;
-    text-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-    box-shadow: 0 10px 30px rgba(255,107,157,0.4);
-    transition: transform 0.2s;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    animation: popIn 0.3s ease;
   }
   
-  .current-letter.pop {
-    animation: pop 0.4s ease;
-  }
-  
-  @keyframes pop {
-    0% { transform: scale(0.5) rotate(-10deg); }
-    50% { transform: scale(1.2) rotate(5deg); }
+  @keyframes popIn {
+    0% { transform: scale(0) rotate(-10deg); }
+    50% { transform: scale(1.2); }
     100% { transform: scale(1) rotate(0); }
   }
   
-  .word-display {
-    background: #fff9e6;
-    border: 4px solid #ffd93d;
-    border-radius: 20px;
-    padding: 20px;
-    min-height: 100px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 20px rgba(255,217,61,0.2);
+  .letter-slot.empty {
+    background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+    color: #636e72;
   }
   
-  .word-display .letter-box {
-    background: linear-gradient(135deg, #6dd5ed, #2193b0);
-    color: #fff;
-    font-size: 2.5rem;
-    font-weight: bold;
-    width: 60px;
-    height: 70px;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
-    box-shadow: 0 5px 15px rgba(33,147,176,0.4);
-    animation: slideIn 0.3s ease;
+  .letter-slot.correct {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    animation: correctPulse 0.5s ease;
   }
   
-  @keyframes slideIn {
-    from { transform: translateY(-30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  
-  .word-display .placeholder {
-    color: #ccc;
-    font-size: 1.2rem;
-    font-style: italic;
+  @keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); box-shadow: 0 0 20px #00b894; }
   }
   
   .controls {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
   
   .btn {
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    font-weight: bold;
+    padding: 12px 25px;
     border: none;
-    border-radius: 50px;
+    border-radius: 25px;
+    font-weight: bold;
     cursor: pointer;
     color: #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    font-size: 1rem;
     transition: all 0.2s;
-    font-family: inherit;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   }
   
   .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
   .btn:active { transform: translateY(0); }
   
-  .btn-speak { background: linear-gradient(135deg, #11998e, #38ef7d); }
-  .btn-delete { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
-  .btn-reset { background: linear-gradient(135deg, #f093fb, #f5576c); }
-  .btn-space { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+  .btn-hint { background: linear-gradient(135deg, #fdcb6e, #f39c12); }
+  .btn-skip { background: linear-gradient(135deg, #ff7675, #d63031); }
+  .btn-next { background: linear-gradient(135deg, #00b894, #00cec9); }
+  .btn-speak { background: linear-gradient(135deg, #0984e3, #74b9ff); }
   
-  .keyboard-hint {
-    background: #f0f8ff;
-    border-radius: 15px;
-    padding: 15px;
-    text-align: center;
-    color: #555;
-    font-size: 0.95rem;
+  .virtual-keyboard {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
   }
   
-  .keyboard-hint strong { color: #ff6b9d; }
-  
-  .stats {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .stat-box {
-    background: linear-gradient(135deg, #a8edea, #fed6e3);
-    padding: 10px 20px;
-    border-radius: 15px;
+  .key {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
     font-weight: bold;
-    color: #333;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 3px 8px rgba(9,132,227,0.3);
   }
   
-  .stat-box span { color: #ff6b9d; font-size: 1.3rem; }
+  .key:hover { transform: scale(1.1); background: linear-gradient(135deg, #0984e3, #74b9ff); }
+  .key:active { transform: scale(0.95); }
   
-  .celebration {
+  .key-space { grid-column: span 3; aspect-ratio: auto; background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+  .key-backspace { grid-column: span 2; aspect-ratio: auto; background: linear-gradient(135deg, #ff7675, #d63031); }
+  .key-enter { grid-column: span 2; aspect-ratio: auto; background: linear-gradient(135deg, #00b894, #00cec9); }
+  
+  .message {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 5rem;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 100;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(255,255,255,0.98);
+    padding: 30px 50px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: transform 0.3s;
   }
   
-  .celebration.show {
-    animation: celebrate 1.5s ease;
+  .message.show { transform: translate(-50%, -50%) scale(1); }
+  .message h2 { color: #00b894; font-size: 2.5rem; margin-bottom: 10px; }
+  .message p { color: #2d3436; font-size: 1.3rem; margin-bottom: 20px; }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 999;
   }
   
-  @keyframes celebrate {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+  .overlay.show { display: block; }
+  
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: #f00;
+    animation: fall linear forwards;
+    z-index: 998;
+  }
+  
+  @keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); }
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #dfe6e9;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00b894, #00cec9);
+    transition: width 0.3s;
   }
   
   @media (max-width: 600px) {
-    h1 { font-size: 1.8rem; }
-    .current-letter { width: 150px; height: 150px; font-size: 7rem; }
-    .word-display .letter-box { width: 45px; height: 55px; font-size: 1.8rem; }
-    .btn { padding: 12px 20px; font-size: 1rem; }
+    h1 { font-size: 1.5rem; }
+    .image-container { height: 200px; }
+    .letter-slot { width: 35px; height: 45px; font-size: 1.5rem; }
+    .virtual-keyboard { grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .key { font-size: 0.9rem; }
+    .btn { padding: 10px 15px; font-size: 0.9rem; }
   }
 </style>
 </head>
 <body>
 
-<h1>🎨 Belajar Huruf & Angka 🎈</h1>
-<p class="subtitle">Tekan tombol keyboard untuk belajar! 🎹</p>
+<h1>🎮 Tebak Kata Bergambar</h1>
 
-<div class="game-container">
-  <div class="current-letter" id="currentLetter">?</div>
+<div class="game-wrapper">
+  <div class="stats-bar">
+    <div class="stat">⭐ Skor: <span id="score">0</span></div>
+    <div class="stat">🎯 Level: <span id="level">1</span></div>
+    <div class="stat">✅ Benar: <span id="correct">0</span></div>
+    <div class="stat">❌ Salah: <span id="wrong">0</span></div>
+  </div>
   
-  <div class="word-display" id="wordDisplay">
-    <span class="placeholder">✨ Ketik huruf untuk menyusun kata... ✨</span>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+  </div>
+  
+  <div class="category-selector">
+    <button class="cat-btn active" onclick="changeCategory('hewan')">🐾 Hewan</button>
+    <button class="cat-btn" onclick="changeCategory('buah')">🍎 Buah</button>
+    <button class="cat-btn" onclick="changeCategory('kendaraan')">🚗 Kendaraan</button>
+    <button class="cat-btn" onclick="changeCategory('makanan')">🍕 Makanan</button>
+    <button class="cat-btn" onclick="changeCategory('benda')">📱 Benda</button>
+  </div>
+  
+  <div class="image-container" id="imageContainer">
+    <div class="image-loading">🔄 Memuat gambar...</div>
+    <img class="game-image" id="gameImage" src="" alt="Tebak kata" style="display:none;">
+  </div>
+  
+  <div class="hint-box" id="hintBox">
+    💡 Petunjuk: <span id="hintText">Klik tombol petunjuk untuk bantuan</span>
+  </div>
+  
+  <div class="word-container" id="wordContainer">
+    <div class="letter-slot empty">?</div>
   </div>
   
   <div class="controls">
-    <button class="btn btn-speak" onclick="speakWord()">🔊 Ucapkan Kata</button>
-    <button class="btn btn-space" onclick="addSpace()">␣ Spasi</button>
-    <button class="btn btn-delete" onclick="deleteLast()">⌫ Hapus</button>
-    <button class="btn btn-reset" onclick="resetGame()">🔄 Reset</button>
+    <button class="btn btn-hint" onclick="showHint()">💡 Petunjuk</button>
+    <button class="btn btn-speak" onclick="speakWord()">🔊 Dengar</button>
+    <button class="btn btn-skip" onclick="skipWord()">⏭ Lewati</button>
+    <button class="btn btn-next" onclick="nextWord()">➡️ Lanjut</button>
   </div>
   
-  <div class="stats">
-    <div class="stat-box">Huruf Ditekan: <span id="totalKeys">0</span></div>
-    <div class="stat-box">Kata Dibentuk: <span id="wordCount">0</span></div>
-    <div class="stat-box">Panjang Kata: <span id="wordLength">0</span></div>
-  </div>
-  
-  <div class="keyboard-hint" style="margin-top:20px;">
-    💡 <strong>Tips:</strong> Tekan huruf A-Z, angka 0-9, Spasi, atau Backspace di keyboard!<br>
-    🎵 Setiap tombol akan mengeluarkan suara huruf/angka tersebut
+  <div class="virtual-keyboard" id="virtualKeyboard">
+    <!-- Generated by JavaScript -->
   </div>
 </div>
 
-<div class="celebration" id="celebration">🎉</div>
+<div class="overlay" id="overlay"></div>
+<div class="message" id="message">
+  <h2 id="messageTitle">🎉 Hebat!</h2>
+  <p id="messageText">Jawabanmu benar!</p>
+  <button class="btn btn-next" onclick="closeMessage()">Lanjut</button>
+</div>
 
 <script>
-  let word = '';
-  let totalKeys = 0;
-  let wordCount = 0;
-  let lastSpaceCount = 0;
+// Database kata dengan gambar nyata (URL dari Unsplash)
+const wordDatabase = {
+  hewan: [
+    { word: 'KUCING', hint: 'Hewan peliharaan yang suka mengeong', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500' },
+    { word: 'ANJING', hint: 'Hewan yang setia dan suka menggonggong', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500' },
+    { word: 'BURUNG', hint: 'Hewan yang bisa terbang', image: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=500' },
+    { word: 'IKAN', hint: 'Hewan yang hidup di air', image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=500' },
+    { word: 'KUDA', hint: 'Hewan yang bisa ditunggangi', image: 'https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=500' },
+    { word: 'SAPI', hint: 'Hewan yang menghasilkan susu', image: 'https://images.unsplash.com/photo-1524429656587-6e0dd1023c4f?w=500' },
+    { word: 'AYAM', hint: 'Hewan yang berkokok di pagi hari', image: 'https://images.unsplash.com/photo-1548550023-2bdb3c5a2d23?w=500' },
+    { word: 'BEbek', hint: 'Hewan yang suka berenang dan berbunyi wek wek', image: 'https://images.unsplash.com/photo-1555852095-64e7428df0fa?w=500' },
+    { word: 'KAMBING', hint: 'Hewan yang suka makan rumput', image: 'https://images.unsplash.com/photo-1524024973431-2ad916668966?w=500' },
+    { word: 'GAJAH', hint: 'Hewan besar dengan belalai panjang', image: 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=500' }
+  ],
+  buah: [
+    { word: 'APEL', hint: 'Buah berwarna merah atau hijau', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500' },
+    { word: 'PISANG', hint: 'Buah berwarna kuning dan panjang', image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500' },
+    { word: 'JERUK', hint: 'Buah berwarna oranye', image: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=500' },
+    { word: 'ANGGUR', hint: 'Buah kecil berwarna ungu atau hijau', image: 'https://images.unsplash.com/photo-1596363505729-4193a3af55eb?w=500' },
+    { word: 'MANGGA', hint: 'Buah tropis yang manis', image: 'https://images.unsplash.com/photo-1553279778-404e6a99d1ef?w=500' },
+    { word: 'NANAS', hint: 'Buah berduri dengan mahkota di atas', image: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=500' },
+    { word: 'SEMANGKA', hint: 'Buah besar berwarna merah di dalam', image: 'https://images.unsplash.com/photo-1587049352846-4a222e7740d8?w=500' },
+    { word: 'STROBERI', hint: 'Buah merah kecil dengan biji di luar', image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500' }
+  ],
+  kendaraan: [
+    { word: 'MOBIL', hint: 'Kendaraan beroda empat', image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500' },
+    { word: 'MOTOR', hint: 'Kendaraan beroda dua', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500' },
+    { word: 'SEPEDA', hint: 'Kendaraan yang dikayuh', image: 'https://images.unsplash.com/photo-1532298274560-1a9010a64513?w=500' },
+    { word: 'PESAWAT', hint: 'Kendaraan yang terbang di udara', image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500' },
+    { word: 'KERETA', hint: 'Kendaraan yang berjalan di rel', image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=500' },
+    { word: 'KAPAL', hint: 'Kendaraan yang berlayar di laut', image: 'https://images.unsplash.com/photo-1506972143111-0cc6c13aff95?w=500' },
+    { word: 'BUS', hint: 'Kendaraan besar untuk banyak penumpang', image: 'https://images.unsplash.com/photo-1570125909232-eb26c87018e0?w=500' },
+    { word: 'TRUK', hint: 'Kendaraan besar untuk mengangkut barang', image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=500' }
+  ],
+  makanan: [
+    { word: 'NASI', hint: 'Makanan pokok orang Indonesia', image: 'https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=500' },
+    { word: 'ROTI', hint: 'Makanan dari tepung yang dipanggang', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500' },
+    { word: 'SUSU', hint: 'Minuman putih bergizi', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500' },
+    { word: 'TELUR', hint: 'Makanan berbentuk oval dari ayam', image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500' },
+    { word: 'PIZZA', hint: 'Makanan Italia berbentuk bulat', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500' },
+    { word: 'MIE', hint: 'Makanan berbentuk panjang', image: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=500' },
+    { word: 'SATE', hint: 'Makanan tusuk dengan bumbu kacang', image: 'https://images.unsplash.com/photo-1632218184834-7bc59f2da623?w=500' },
+    { word: 'BAKSO', hint: 'Makanan bola-bola daging dalam kuah', image: 'https://images.unsplash.com/photo-1626202158825-d05c5a5d9db9?w=500' }
+  ],
+  benda: [
+    { word: 'BUKU', hint: 'Alat untuk membaca dan menulis', image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500' },
+    { word: 'PENA', hint: 'Alat untuk menulis', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=500' },
+    { word: 'TELEPON', hint: 'Alat untuk berkomunikasi', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500' },
+    { word: 'JAM', hint: 'Alat untuk melihat waktu', image: 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=500' },
+    { word: 'KACA', hint: 'Alat untuk bercermin', image: 'https://images.unsplash.com/photo-1513506003011-3b03c801c69b?w=500' },
+    { word: 'PAYUNG', hint: 'Alat untuk melindungi dari hujan', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500' },
+    { word: 'SEPATU', hint: 'Alas kaki', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500' },
+    { word: 'TOPI', hint: 'Penutup kepala', image: 'https://images.unsplash.com/photo-1514327605112-b887c0e61c0a?w=500' }
+  ]
+};
+
+let currentCategory = 'hewan';
+let currentWord = '';
+let currentHint = '';
+let userAnswer = '';
+let score = 0;
+let level = 1;
+let correctCount = 0;
+let wrongCount = 0;
+let currentIndex = 0;
+let shuffledWords = [];
+
+// Inisialisasi
+function init() {
+  createVirtualKeyboard();
+  shuffleCategory();
+  loadNewWord();
+  updateStats();
+}
+
+// Buat keyboard virtual
+function createVirtualKeyboard() {
+  const keyboard = document.getElementById('virtualKeyboard');
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   
-  const currentLetterEl = document.getElementById('currentLetter');
-  const wordDisplayEl = document.getElementById('wordDisplay');
-  const totalKeysEl = document.getElementById('totalKeys');
-  const wordCountEl = document.getElementById('wordCount');
-  const wordLengthEl = document.getElementById('wordLength');
-  const celebrationEl = document.getElementById('celebration');
-  
-  // Inisialisasi speech synthesis
-  const synth = window.speechSynthesis;
-  let voiceID = null;
-  
-  // Muat suara bahasa Indonesia
-  function loadVoices() {
-    const voices = synth.getVoices();
-    // Cari suara Indonesia, jika tidak ada pakai default
-    voiceID = voices.find(v => v.lang.startsWith('id')) || 
-              voices.find(v => v.lang.startsWith('ms')) || 
-              voices[0];
+  for (let letter of letters) {
+    const btn = document.createElement('button');
+    btn.className = 'key';
+    btn.textContent = letter;
+    btn.onclick = () => addLetter(letter);
+    keyboard.appendChild(btn);
   }
   
-  if (synth.onvoiceschanged !== undefined) {
-    synth.onvoiceschanged = loadVoices;
-  }
-  loadVoices();
+  const spaceBtn = document.createElement('button');
+  spaceBtn.className = 'key key-space';
+  spaceBtn.textContent = 'SPASI';
+  spaceBtn.onclick = () => addLetter(' ');
+  keyboard.appendChild(spaceBtn);
   
-  // Fungsi untuk mengucapkan teks
-  function speak(text, rate = 0.9, pitch = 1.3) {
-    if (!text) return;
-    synth.cancel(); // Hentikan suara sebelumnya
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'id-ID';
-    utter.rate = rate;
-    utter.pitch = pitch;
-    utter.volume = 1;
-    if (voiceID) utter.voice = voiceID;
-    synth.speak(utter);
+  const backspaceBtn = document.createElement('button');
+  backspaceBtn.className = 'key key-backspace';
+  backspaceBtn.textContent = '⌫ HAPUS';
+  backspaceBtn.onclick = deleteLetter;
+  keyboard.appendChild(backspaceBtn);
+  
+  const enterBtn = document.createElement('button');
+  enterBtn.className = 'key key-enter';
+  enterBtn.textContent = '✓ ENTER';
+  enterBtn.onclick = checkAnswer;
+  keyboard.appendChild(enterBtn);
+}
+
+// Acak urutan kata dalam kategori
+function shuffleCategory() {
+  shuffledWords = [...wordDatabase[currentCategory]];
+  for (let i = shuffledWords.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+  }
+  currentIndex = 0;
+}
+
+// Ganti kategori
+function changeCategory(category) {
+  currentCategory = category;
+  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  shuffleCategory();
+  loadNewWord();
+}
+
+// Muat kata baru
+function loadNewWord() {
+  if (currentIndex >= shuffledWords.length) {
+    shuffleCategory();
   }
   
-  // Fungsi untuk mengucapkan satu huruf/angka
-  function speakLetter(char) {
-    // Untuk angka, ucapkan sebagai angka
-    if (/[0-9]/.test(char)) {
-      speak(char, 0.8, 1.3);
-    } else {
-      speak(char, 0.8, 1.3);
-    }
-  }
+  const data = shuffledWords[currentIndex];
+  currentWord = data.word.toUpperCase();
+  currentHint = data.hint;
+  userAnswer = '';
   
-  // Fungsi untuk mengucapkan kata penuh
-  function speakWord() {
-    if (word.trim().length === 0) {
-      speak('Belum ada kata', 1, 1.2);
-      return;
-    }
-    speak(word, 0.85, 1.2);
-    showCelebration('🎉');
-  }
+  // Load gambar
+  const img = document.getElementById('gameImage');
+  const loading = document.querySelector('.image-loading');
+  loading.style.display = 'block';
+  img.style.display = 'none';
   
-  // Update tampilan kata
-  function updateWordDisplay() {
-    if (word.length === 0) {
-      wordDisplayEl.innerHTML = '<span class="placeholder">✨ Ketik huruf untuk menyusun kata... ✨</span>';
-    } else {
-      wordDisplayEl.innerHTML = '';
-      for (let char of word) {
-        const box = document.createElement('div');
-        box.className = 'letter-box';
-        box.textContent = char === ' ' ? '␣' : char;
-        if (char === ' ') {
-          box.style.background = 'linear-gradient(135deg, #ffecd2, #fcb69f)';
-          box.style.color = '#ff6b9d';
-        }
-        wordDisplayEl.appendChild(box);
+  img.onload = () => {
+    loading.style.display = 'none';
+    img.style.display = 'block';
+  };
+  
+  img.src = data.image;
+  
+  // Update petunjuk
+  document.getElementById('hintText').textContent = currentHint;
+  
+  // Render slots
+  renderWordSlots();
+  
+  // Update progress
+  const progress = ((currentIndex) / shuffledWords.length) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+}
+
+// Render slot huruf
+function renderWordSlots() {
+  const container = document.getElementById('wordContainer');
+  container.innerHTML = '';
+  
+  const answerArray = userAnswer.split('');
+  
+  for (let i = 0; i < currentWord.length; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'letter-slot';
+    
+    if (i < answerArray.length) {
+      slot.textContent = answerArray[i];
+      if (answerArray[i] === currentWord[i]) {
+        slot.classList.add('correct');
       }
-    }
-    wordLengthEl.textContent = word.length;
-  }
-  
-  // Tampilkan huruf besar saat ini
-  function showCurrentLetter(char) {
-    currentLetterEl.textContent = char === ' ' ? '␣' : char;
-    currentLetterEl.classList.remove('pop');
-    void currentLetterEl.offsetWidth; // Trigger reflow
-    currentLetterEl.classList.add('pop');
-  }
-  
-  // Tampilkan animasi perayaan
-  function showCelebration(emoji = '🎉') {
-    celebrationEl.textContent = emoji;
-    celebrationEl.classList.remove('show');
-    void celebrationEl.offsetWidth;
-    celebrationEl.classList.add('show');
-  }
-  
-  // Tambah spasi
-  function addSpace() {
-    if (word.length > 0 && word[word.length - 1] !== ' ') {
-      word += ' ';
-      showCurrentLetter(' ');
-      speak('spasi', 1, 1.3);
-      updateWordDisplay();
-      totalKeys++;
-      totalKeysEl.textContent = totalKeys;
-      
-      // Hitung kata
-      const currentWords = word.trim().split(/\s+/).filter(w => w.length > 0).length;
-      if (currentWords > lastSpaceCount) {
-        wordCount = currentWords;
-        wordCountEl.textContent = wordCount;
-        lastSpaceCount = currentWords;
-      }
-    }
-  }
-  
-  // Hapus huruf terakhir
-  function deleteLast() {
-    if (word.length > 0) {
-      const removed = word[word.length - 1];
-      word = word.slice(0, -1);
-      speak('hapus', 1, 1.3);
-      updateWordDisplay();
-      showCurrentLetter('⌫');
-      
-      // Update word count
-      const currentWords = word.trim().split(/\s+/).filter(w => w.length > 0).length;
-      wordCount = currentWords;
-      wordCountEl.textContent = wordCount;
-      lastSpaceCount = currentWords;
-    }
-  }
-  
-  // Reset game
-  function resetGame() {
-    word = '';
-    totalKeys = 0;
-    wordCount = 0;
-    lastSpaceCount = 0;
-    totalKeysEl.textContent = 0;
-    wordCountEl.textContent = 0;
-    updateWordDisplay();
-    showCurrentLetter('?');
-    speak('reset', 1, 1.3);
-    showCelebration('🔄');
-  }
-  
-  // Event listener keyboard
-  document.addEventListener('keydown', function(e) {
-    // Abaikan tombol khusus (Ctrl, Alt, Shift, dll)
-    if (e.ctrlKey || e.altKey || e.metaKey) return;
-    
-    const key = e.key;
-    
-    // Tombol spasi
-    if (key === ' ') {
-      e.preventDefault();
-      addSpace();
-      return;
+    } else {
+      slot.classList.add('empty');
+      slot.textContent = '?';
     }
     
-    // Tombol Backspace
-    if (key === 'Backspace') {
-      e.preventDefault();
-      deleteLast();
-      return;
-    }
-    
-    // Tombol Enter - ucapkan kata
-    if (key === 'Enter') {
-      e.preventDefault();
-      speakWord();
-      return;
-    }
-    
-    // Huruf A-Z
-    if (/^[a-zA-Z]$/.test(key)) {
-      const upperChar = key.toUpperCase();
-      word += upperChar;
-      totalKeys++;
-      totalKeysEl.textContent = totalKeys;
-      showCurrentLetter(upperChar);
-      speakLetter(upperChar);
-      updateWordDisplay();
-      return;
-    }
-    
-    // Angka 0-9
-    if (/^[0-9]$/.test(key)) {
-      word += key;
-      totalKeys++;
-      totalKeysEl.textContent = totalKeys;
-      showCurrentLetter(key);
-      speakLetter(key);
-      updateWordDisplay();
-      return;
-    }
-  });
+    container.appendChild(slot);
+  }
+}
+
+// Tambah huruf
+function addLetter(letter) {
+  if (userAnswer.length < currentWord.length) {
+    userAnswer += letter;
+    renderWordSlots();
+    speakLetter(letter);
+  }
+}
+
+// Hapus huruf
+function deleteLetter() {
+  userAnswer = userAnswer.slice(0, -1);
+  renderWordSlots();
+}
+
+// Cek jawaban
+function checkAnswer() {
+  if (userAnswer.length === 0) {
+    showMessage('⚠️', 'Ketik jawaban dulu ya!');
+    return;
+  }
   
-  // Sentuhan awal - ucapkan selamat datang
-  window.addEventListener('load', () => {
+  if (userAnswer.toUpperCase() === currentWord) {
+    // Jawaban benar
+    score += 10 * level;
+    correctCount++;
+    
+    // Naik level setiap 5 jawaban benar
+    if (correctCount % 5 === 0) {
+      level++;
+      showMessage('🎊 Level Up!', `Selamat! Kamu naik ke level ${level}`);
+    } else {
+      showMessage('🎉 Hebat!', `Jawabanmu benar: ${currentWord}`);
+    }
+    
+    createConfetti();
+    updateStats();
+    currentIndex++;
+    
     setTimeout(() => {
-      speak('Selamat datang! Ayo belajar huruf dan angka!', 1, 1.3);
-    }, 500);
-  });
+      closeMessage();
+      loadNewWord();
+    }, 2000);
+  } else {
+    // Jawaban salah
+    wrongCount++;
+    updateStats();
+    showMessage('❌', `Masih kurang tepat. Coba lagi!`);
+  }
+}
+
+// Tampilkan petunjuk
+function showHint() {
+  score = Math.max(0, score - 2);
+  updateStats();
+  
+  // Tampilkan huruf pertama
+  if (userAnswer.length === 0) {
+    userAnswer = currentWord[0];
+    renderWordSlots();
+    speakLetter(currentWord[0]);
+  }
+}
+
+// Lewati kata
+function skipWord() {
+  score = Math.max(0, score - 5);
+  updateStats();
+  showMessage('⏭️', `Jawabannya adalah: ${currentWord}`);
+  currentIndex++;
+  
+  setTimeout(() => {
+    closeMessage();
+    loadNewWord();
+  }, 2000);
+}
+
+// Kata berikutnya
+function nextWord() {
+  currentIndex++;
+  if (currentIndex >= shuffledWords.length) {
+    shuffleCategory();
+  }
+  loadNewWord();
+}
+
+// Update statistik
+function updateStats() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('level').textContent = level;
+  document.getElementById('correct').textContent = correctCount;
+  document.getElementById('wrong').textContent = wrongCount;
+}
+
+// Tampilkan pesan
+function showMessage(title, text) {
+  document.getElementById('messageTitle').textContent = title;
+  document.getElementById('messageText').textContent = text;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('message').classList.add('show');
+}
+
+// Tutup pesan
+function closeMessage() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('message').classList.remove('show');
+}
+
+// Efek confetti
+function createConfetti() {
+  const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff', '#ffa500'];
+  
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => confetti.remove(), 4000);
+    }, i * 30);
+  }
+}
+
+// Speech synthesis
+const synth = window.speechSynthesis;
+let voice = null;
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  voice = voices.find(v => v.lang.startsWith('id')) || voices[0];
+}
+
+if (synth.onvoiceschanged !== undefined) {
+  synth.onvoiceschanged = loadVoices;
+}
+loadVoices();
+
+function speak(text, rate = 0.9) {
+  synth.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'id-ID';
+  utter.rate = rate;
+  utter.pitch = 1.2;
+  if (voice) utter.voice = voice;
+  synth.speak(utter);
+}
+
+function speakLetter(letter) {
+  speak(letter, 0.8);
+}
+
+function speakWord() {
+  speak(currentHint + '. Jawabannya adalah ' + currentWord.split('').join(' '));
+}
+
+// Keyboard event
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  
+  const key = e.key.toUpperCase();
+  
+  if (/^[A-Z]$/.test(key)) {
+    addLetter(key);
+  } else if (e.key === 'Backspace') {
+    deleteLetter();
+  } else if (e.key === ' ' || e.key === 'Spacebar') {
+    e.preventDefault();
+    addLetter(' ');
+  } else if (e.key === 'Enter') {
+    checkAnswer();
+  }
+});
+
+// Start game
+window.addEventListener('load', () => {
+  init();
+  setTimeout(() => {
+    speak('Selamat datang di game Tebak Kata! Pilih kategori dan tebak gambar yang muncul.');
+  }, 1000);
+});
 </script>
 
 </body>
