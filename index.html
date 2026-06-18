@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎨 Belajar Huruf & Angka - Game Edukasi Anak</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif; }
+  
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #a1c4fd 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  
+  h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    text-shadow: 3px 3px 0 #ff6b9d, 6px 6px 10px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+    text-align: center;
+    animation: bounce 2s infinite;
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .subtitle {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  
+  .game-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 900px;
+    border: 5px dashed #ff6b9d;
+  }
+  
+  .current-letter {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #ffd93d, #ff6b9d);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(255,107,157,0.4);
+    transition: transform 0.2s;
+  }
+  
+  .current-letter.pop {
+    animation: pop 0.4s ease;
+  }
+  
+  @keyframes pop {
+    0% { transform: scale(0.5) rotate(-10deg); }
+    50% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  
+  .word-display {
+    background: #fff9e6;
+    border: 4px solid #ffd93d;
+    border-radius: 20px;
+    padding: 20px;
+    min-height: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 20px rgba(255,217,61,0.2);
+  }
+  
+  .word-display .letter-box {
+    background: linear-gradient(135deg, #6dd5ed, #2193b0);
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: bold;
+    width: 60px;
+    height: 70px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(33,147,176,0.4);
+    animation: slideIn 0.3s ease;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .word-display .placeholder {
+    color: #ccc;
+    font-size: 1.2rem;
+    font-style: italic;
+  }
+  
+  .controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .btn:active { transform: translateY(0); }
+  
+  .btn-speak { background: linear-gradient(135deg, #11998e, #38ef7d); }
+  .btn-delete { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+  .btn-reset { background: linear-gradient(135deg, #f093fb, #f5576c); }
+  .btn-space { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+  
+  .keyboard-hint {
+    background: #f0f8ff;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    color: #555;
+    font-size: 0.95rem;
+  }
+  
+  .keyboard-hint strong { color: #ff6b9d; }
+  
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .stat-box {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-weight: bold;
+    color: #333;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  }
+  
+  .stat-box span { color: #ff6b9d; font-size: 1.3rem; }
+  
+  .celebration {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5rem;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 100;
+  }
+  
+  .celebration.show {
+    animation: celebrate 1.5s ease;
+  }
+  
+  @keyframes celebrate {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+  }
+  
+  @media (max-width: 600px) {
+    h1 { font-size: 1.8rem; }
+    .current-letter { width: 150px; height: 150px; font-size: 7rem; }
+    .word-display .letter-box { width: 45px; height: 55px; font-size: 1.8rem; }
+    .btn { padding: 12px 20px; font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🎨 Belajar Huruf & Angka 🎈</h1>
+<p class="subtitle">Tekan tombol keyboard untuk belajar! 🎹</p>
+
+<div class="game-container">
+  <div class="current-letter" id="currentLetter">?</div>
+  
+  <div class="word-display" id="wordDisplay">
+    <span class="placeholder">✨ Ketik huruf untuk menyusun kata... ✨</span>
+  </div>
+  
+  <div class="controls">
+    <button class="btn btn-speak" onclick="speakWord()">🔊 Ucapkan Kata</button>
+    <button class="btn btn-space" onclick="addSpace()">␣ Spasi</button>
+    <button class="btn btn-delete" onclick="deleteLast()">⌫ Hapus</button>
+    <button class="btn btn-reset" onclick="resetGame()">🔄 Reset</button>
+  </div>
+  
+  <div class="stats">
+    <div class="stat-box">Huruf Ditekan: <span id="totalKeys">0</span></div>
+    <div class="stat-box">Kata Dibentuk: <span id="wordCount">0</span></div>
+    <div class="stat-box">Panjang Kata: <span id="wordLength">0</span></div>
+  </div>
+  
+  <div class="keyboard-hint" style="margin-top:20px;">
+    💡 <strong>Tips:</strong> Tekan huruf A-Z, angka 0-9, Spasi, atau Backspace di keyboard!<br>
+    🎵 Setiap tombol akan mengeluarkan suara huruf/angka tersebut
+  </div>
+</div>
+
+<div class="celebration" id="celebration">🎉</div>
+
+<script>
+  let word = '';
+  let totalKeys = 0;
+  let wordCount = 0;
+  let lastSpaceCount = 0;
+  
+  const currentLetterEl = document.getElementById('currentLetter');
+  const wordDisplayEl = document.getElementById('wordDisplay');
+  const totalKeysEl = document.getElementById('totalKeys');
+  const wordCountEl = document.getElementById('wordCount');
+  const wordLengthEl = document.getElementById('wordLength');
+  const celebrationEl = document.getElementById('celebration');
+  
+  // Inisialisasi speech synthesis
+  const synth = window.speechSynthesis;
+  let voiceID = null;
+  
+  // Muat suara bahasa Indonesia
+  function loadVoices() {
+    const voices = synth.getVoices();
+    // Cari suara Indonesia, jika tidak ada pakai default
+    voiceID = voices.find(v => v.lang.startsWith('id')) || 
+              voices.find(v => v.lang.startsWith('ms')) || 
+              voices[0];
+  }
+  
+  if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadVoices;
+  }
+  loadVoices();
+  
+  // Fungsi untuk mengucapkan teks
+  function speak(text, rate = 0.9, pitch = 1.3) {
+    if (!text) return;
+    synth.cancel(); // Hentikan suara sebelumnya
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'id-ID';
+    utter.rate = rate;
+    utter.pitch = pitch;
+    utter.volume = 1;
+    if (voiceID) utter.voice = voiceID;
+    synth.speak(utter);
+  }
+  
+  // Fungsi untuk mengucapkan satu huruf/angka
+  function speakLetter(char) {
+    // Untuk angka, ucapkan sebagai angka
+    if (/[0-9]/.test(char)) {
+      speak(char, 0.8, 1.3);
+    } else {
+      speak(char, 0.8, 1.3);
+    }
+  }
+  
+  // Fungsi untuk mengucapkan kata penuh
+  function speakWord() {
+    if (word.trim().length === 0) {
+      speak('Belum ada kata', 1, 1.2);
+      return;
+    }
+    speak(word, 0.85, 1.2);
+    showCelebration('🎉');
+  }
+  
+  // Update tampilan kata
+  function updateWordDisplay() {
+    if (word.length === 0) {
+      wordDisplayEl.innerHTML = '<span class="placeholder">✨ Ketik huruf untuk menyusun kata... ✨</span>';
+    } else {
+      wordDisplayEl.innerHTML = '';
+      for (let char of word) {
+        const box = document.createElement('div');
+        box.className = 'letter-box';
+        box.textContent = char === ' ' ? '␣' : char;
+        if (char === ' ') {
+          box.style.background = 'linear-gradient(135deg, #ffecd2, #fcb69f)';
+          box.style.color = '#ff6b9d';
+        }
+        wordDisplayEl.appendChild(box);
+      }
+    }
+    wordLengthEl.textContent = word.length;
+  }
+  
+  // Tampilkan huruf besar saat ini
+  function showCurrentLetter(char) {
+    currentLetterEl.textContent = char === ' ' ? '␣' : char;
+    currentLetterEl.classList.remove('pop');
+    void currentLetterEl.offsetWidth; // Trigger reflow
+    currentLetterEl.classList.add('pop');
+  }
+  
+  // Tampilkan animasi perayaan
+  function showCelebration(emoji = '🎉') {
+    celebrationEl.textContent = emoji;
+    celebrationEl.classList.remove('show');
+    void celebrationEl.offsetWidth;
+    celebrationEl.classList.add('show');
+  }
+  
+  // Tambah spasi
+  function addSpace() {
+    if (word.length > 0 && word[word.length - 1] !== ' ') {
+      word += ' ';
+      showCurrentLetter(' ');
+      speak('spasi', 1, 1.3);
+      updateWordDisplay();
+      totalKeys++;
+      totalKeysEl.textContent = totalKeys;
+      
+      // Hitung kata
+      const currentWords = word.trim().split(/\s+/).filter(w => w.length > 0).length;
+      if (currentWords > lastSpaceCount) {
+        wordCount = currentWords;
+        wordCountEl.textContent = wordCount;
+        lastSpaceCount = currentWords;
+      }
+    }
+  }
+  
+  // Hapus huruf terakhir
+  function deleteLast() {
+    if (word.length > 0) {
+      const removed = word[word.length - 1];
+      word = word.slice(0, -1);
+      speak('hapus', 1, 1.3);
+      updateWordDisplay();
+      showCurrentLetter('⌫');
+      
+      // Update word count
+      const currentWords = word.trim().split(/\s+/).filter(w => w.length > 0).length;
+      wordCount = currentWords;
+      wordCountEl.textContent = wordCount;
+      lastSpaceCount = currentWords;
+    }
+  }
+  
+  // Reset game
+  function resetGame() {
+    word = '';
+    totalKeys = 0;
+    wordCount = 0;
+    lastSpaceCount = 0;
+    totalKeysEl.textContent = 0;
+    wordCountEl.textContent = 0;
+    updateWordDisplay();
+    showCurrentLetter('?');
+    speak('reset', 1, 1.3);
+    showCelebration('🔄');
+  }
+  
+  // Event listener keyboard
+  document.addEventListener('keydown', function(e) {
+    // Abaikan tombol khusus (Ctrl, Alt, Shift, dll)
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    
+    const key = e.key;
+    
+    // Tombol spasi
+    if (key === ' ') {
+      e.preventDefault();
+      addSpace();
+      return;
+    }
+    
+    // Tombol Backspace
+    if (key === 'Backspace') {
+      e.preventDefault();
+      deleteLast();
+      return;
+    }
+    
+    // Tombol Enter - ucapkan kata
+    if (key === 'Enter') {
+      e.preventDefault();
+      speakWord();
+      return;
+    }
+    
+    // Huruf A-Z
+    if (/^[a-zA-Z]$/.test(key)) {
+      const upperChar = key.toUpperCase();
+      word += upperChar;
+      totalKeys++;
+      totalKeysEl.textContent = totalKeys;
+      showCurrentLetter(upperChar);
+      speakLetter(upperChar);
+      updateWordDisplay();
+      return;
+    }
+    
+    // Angka 0-9
+    if (/^[0-9]$/.test(key)) {
+      word += key;
+      totalKeys++;
+      totalKeysEl.textContent = totalKeys;
+      showCurrentLetter(key);
+      speakLetter(key);
+      updateWordDisplay();
+      return;
+    }
+  });
+  
+  // Sentuhan awal - ucapkan selamat datang
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      speak('Selamat datang! Ayo belajar huruf dan angka!', 1, 1.3);
+    }, 500);
+  });
+</script>
+
+</body>
+</html>
